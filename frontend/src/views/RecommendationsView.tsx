@@ -95,6 +95,7 @@ export function RecommendationsView() {
   const [results, setResults] = useState<Record<string, AcceptResult>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [progress, setProgress] = useState<Record<string, AcceptProgress>>({})
+  const [selectedId, setSelectedId] = useState<string | null>(null)
 
   const recommendations = useQuery({ queryKey: ['recommendations'], queryFn: getRecommendations })
 
@@ -124,30 +125,50 @@ export function RecommendationsView() {
   })
 
   const recs = recommendations.data ?? []
+  const active = recs.find(r => r.id === selectedId) ?? recs[0] ?? null
 
   return (
     <div className="view">
-      <p className="view-note">
-        Workflows we detected by watching your activity. Accepting one generates a detailed skill and installs it
-        locally — it still runs under human approval, never automatically.
-      </p>
-      <div className="rec-list">
-        {recommendations.isLoading ? <div className="empty-state">Mining your activity for repeated workflows…</div> : null}
-        {!recommendations.isLoading && recs.length === 0 ? (
-          <div className="empty-state">No repeated workflows detected yet. Keep working — we’re watching.</div>
-        ) : null}
-        {recs.map(rec => (
-          <RecommendationCard
-            key={rec.id}
-            rec={rec}
-            onAccept={accept.mutate}
-            accepting={accept.isPending && accept.variables === rec.id}
-            progress={progress[rec.id]}
-            result={results[rec.id]}
-            error={errors[rec.id]}
-          />
-        ))}
-      </div>
+      {recommendations.isLoading ? <div className="empty-state">Mining your activity for repeated workflows…</div> : null}
+      {!recommendations.isLoading && recs.length === 0 ? (
+        <div className="empty-state">No repeated workflows detected yet. Keep working — we’re watching.</div>
+      ) : null}
+      {recs.length ? (
+        <div className="split-pane">
+          <aside className="split-list">
+            {recs.map(rec => {
+              const installed = rec.status === 'accepted' || results[rec.id]?.status === 'installed'
+              return (
+                <button
+                  key={rec.id}
+                  type="button"
+                  className={`split-item ${active?.id === rec.id ? 'active' : ''}`}
+                  onClick={() => setSelectedId(rec.id)}
+                >
+                  <strong>{rec.title}</strong>
+                  <span>
+                    {Math.round(rec.confidence * 100)}% · {rec.source_apps.join(' + ')}
+                    {installed ? ' · installed' : ''}
+                  </span>
+                </button>
+              )
+            })}
+          </aside>
+          <div className="split-detail">
+            {active ? (
+              <RecommendationCard
+                key={active.id}
+                rec={active}
+                onAccept={accept.mutate}
+                accepting={accept.isPending && accept.variables === active.id}
+                progress={progress[active.id]}
+                result={results[active.id]}
+                error={errors[active.id]}
+              />
+            ) : null}
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }

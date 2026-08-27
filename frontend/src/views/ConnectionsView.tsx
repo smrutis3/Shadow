@@ -8,15 +8,11 @@ export function ConnectionsView() {
 
   return (
     <div className="view">
-      <p className="view-note">
-        The event sources you’ve connected for us to watch. Onboarding is just connecting the tools your team already
-        uses — we observe, we don’t act.
-      </p>
-      <div className="conn-grid">
+      <div className="conn-strip">
         {connections.isLoading ? <div className="empty-state">Connecting…</div> : null}
         {(connections.data ?? []).map(conn => (
-          <div className="conn-card" key={conn.id}>
-            <div className="conn-head">
+          <div className="conn-row" key={conn.id}>
+            <div className="conn-row-id">
               <SourceChip source={conn.id} />
               <span className="conn-status">
                 <span className="conn-dot" /> {conn.status}

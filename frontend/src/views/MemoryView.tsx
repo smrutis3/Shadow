@@ -54,35 +54,36 @@ export function MemoryView() {
   const rows = trace.data ?? []
 
   return (
-    <div className="view">
-      <p className="view-note">
-        Every time the agent writes a preference or recalls one, it shows up here — autonomous reads and writes against
-        HydraDB. This is the agent's long-term memory, live.
-      </p>
+    <div className="view memory-split">
+      <aside className="mem-status-card">
+        {mem ? (
+          <>
+            <div className="mem-status-row">
+              <span className={`mem-dot ${mem.backend === 'hydradb' ? 'on' : ''}`} />
+              <strong>{mem.backend === 'hydradb' ? 'Connected to HydraDB' : 'Local fallback memory'}</strong>
+            </div>
+            <div className="mem-status-meta">
+              <span>tenant: <code>{mem.tenant_id}</code></span>
+              <span>namespace: <code>{mem.sub_tenant_id}</code></span>
+            </div>
+          </>
+        ) : (
+          <div className="empty-state compact">Loading memory status…</div>
+        )}
+      </aside>
 
-      {mem ? (
-        <div className="mem-status-card">
-          <div className="mem-status-row">
-            <span className={`mem-dot ${mem.backend === 'hydradb' ? 'on' : ''}`} />
-            <strong>{mem.backend === 'hydradb' ? 'Connected to HydraDB' : 'Local fallback memory'}</strong>
-          </div>
-          <div className="mem-status-meta">
-            <span>tenant: <code>{mem.tenant_id}</code></span>
-            <span>namespace: <code>{mem.sub_tenant_id}</code></span>
-          </div>
-        </div>
-      ) : null}
-
-      <h4 className="skill-sub">Memory activity</h4>
-      {rows.length === 0 ? (
-        <div className="empty-state">No memory activity yet. Give a skill feedback or run one to see reads/writes.</div>
-      ) : (
-        <ul className="trace-list">
-          {rows.map((e, i) => (
-            <TraceRow key={`${e.ts}-${i}`} e={e} />
-          ))}
-        </ul>
-      )}
+      <div>
+        <h4 className="skill-sub">Memory activity</h4>
+        {rows.length === 0 ? (
+          <div className="empty-state">No memory activity yet. Give a skill feedback or run one to see reads/writes.</div>
+        ) : (
+          <ul className="trace-list">
+            {rows.map((e, i) => (
+              <TraceRow key={`${e.ts}-${i}`} e={e} />
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   )
 }

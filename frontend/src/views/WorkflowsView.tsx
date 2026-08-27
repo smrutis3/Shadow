@@ -49,12 +49,7 @@ export function WorkflowsView() {
 
   return (
     <div className="view">
-      <p className="view-note">
-        Above individual skills: the end-to-end processes a forward-deployed engineer would deploy to lift the whole
-        team’s efficiency. Each composes several skills into one workflow, with the org-level impact and a
-        deployment recommendation.
-      </p>
-      <div className="rec-list">
+      <div className="wf-board">
         {workflows.isLoading ? <div className="empty-state">Composing org-level workflows…</div> : null}
         {!workflows.isLoading && items.length === 0 ? (
           <div className="empty-state">No org workflows yet — accept more skills so we can compose them.</div>

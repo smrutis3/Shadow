@@ -172,63 +172,67 @@ function SkillDetail({
 }) {
   return (
     <div className="skill-detail">
-      <div className="skill-detail-head">
-        <div>
-          <h3>{skill.name}</h3>
-          <div className="rec-apps">
-            {skill.source_apps.map(app => (
-              <SourceChip key={app} source={app} />
-            ))}
-            <span className={`local-pill ${skill.installed_locally ? 'is-local' : ''}`}>
-              {skill.installed_locally ? 'Installed in Codex' : 'Generated (not installed)'}
-            </span>
+      <div className="skill-workbench">
+        <section className="skill-stage">
+          <div className="skill-detail-head">
+            <div>
+              <h3>{skill.name}</h3>
+              <div className="rec-apps">
+                {skill.source_apps.map(app => (
+                  <SourceChip key={app} source={app} />
+                ))}
+                <span className={`local-pill ${skill.installed_locally ? 'is-local' : ''}`}>
+                  {skill.installed_locally ? 'Installed in Codex' : 'Generated (not installed)'}
+                </span>
+              </div>
+            </div>
+            <div className="skill-usage">
+              <div className="metric-value">{skill.invocations}</div>
+              <div className="metric-label">invocations</div>
+            </div>
           </div>
-        </div>
-        <div className="skill-usage">
-          <div className="metric-value">{skill.invocations}</div>
-          <div className="metric-label">invocations</div>
-        </div>
+
+          {skill.description ? <p className="skill-desc">{skill.description}</p> : null}
+          {skill.installed_locally && skill.codex_invoke ? (
+            <p className="skill-path">
+              Installed as a Codex workflow — run <code>{skill.codex_invoke}</code> inside Codex
+              {skill.local_path ? <> · <code>{skill.local_path}</code></> : null}
+            </p>
+          ) : skill.installed_locally && skill.local_path ? (
+            <p className="skill-path">
+              <code>{skill.local_path}</code>
+            </p>
+          ) : null}
+
+          <h4 className="skill-sub">What this skill does</h4>
+          <SkillDiagram graph={skill.graph} />
+
+          {skill.guardrails.length ? (
+            <>
+              <h4 className="skill-sub">Guardrails</h4>
+              <ul className="skill-guardrails">
+                {skill.guardrails.map((g, i) => (
+                  <li key={i}>{g}</li>
+                ))}
+              </ul>
+            </>
+          ) : null}
+        </section>
+
+        <aside className="skill-ops">
+          <h4 className="skill-sub">Invocation trend</h4>
+          <TrendChart data={skill.trend ?? []} />
+          <FeedbackPanel
+            onSubmit={onSubmitFeedback}
+            onRegenerate={onRegenerate}
+            submitting={submitting}
+            regenerating={regenerating}
+            progress={progress}
+            savedMsg={savedMsg}
+          />
+          <RunPanel onRun={onRun} running={running} result={runResult} />
+        </aside>
       </div>
-
-      {skill.description ? <p className="skill-desc">{skill.description}</p> : null}
-      {skill.installed_locally && skill.codex_invoke ? (
-        <p className="skill-path">
-          Installed as a Codex workflow — run <code>{skill.codex_invoke}</code> inside Codex
-          {skill.local_path ? <> · <code>{skill.local_path}</code></> : null}
-        </p>
-      ) : skill.installed_locally && skill.local_path ? (
-        <p className="skill-path">
-          <code>{skill.local_path}</code>
-        </p>
-      ) : null}
-
-      <h4 className="skill-sub">Invocation trend</h4>
-      <TrendChart data={skill.trend ?? []} />
-
-      <h4 className="skill-sub">What this skill does</h4>
-      <SkillDiagram graph={skill.graph} />
-
-      {skill.guardrails.length ? (
-        <>
-          <h4 className="skill-sub">Guardrails</h4>
-          <ul className="skill-guardrails">
-            {skill.guardrails.map((g, i) => (
-              <li key={i}>{g}</li>
-            ))}
-          </ul>
-        </>
-      ) : null}
-
-      <FeedbackPanel
-        onSubmit={onSubmitFeedback}
-        onRegenerate={onRegenerate}
-        submitting={submitting}
-        regenerating={regenerating}
-        progress={progress}
-        savedMsg={savedMsg}
-      />
-
-      <RunPanel onRun={onRun} running={running} result={runResult} />
     </div>
   )
 }
@@ -298,51 +302,42 @@ export function SkillsView() {
           </span>
         ) : null}
       </p>
-      <div className="skills-layout">
-        <div className="skill-list">
-          {items.map(skill => {
-            const isActive = active?.skill_id === skill.skill_id
-            return (
-              <button
-                key={skill.skill_id}
-                type="button"
-                className={`skill-pick ${isActive ? 'active' : ''}`}
-                onClick={() => setSelected(skill.skill_id)}
-              >
-                <h4>{skill.name}</h4>
-                <div className="skill-pick-meta">
-                  <span>{skill.step_count} steps</span>
-                  <span>· {skill.invocations} runs</span>
-                  <span className={`dot-status status-${skill.status}`}>{skill.status}</span>
-                </div>
-                <div className="rec-apps">
-                  {skill.source_apps.map(app => (
-                    <SourceChip key={app} source={app} />
-                  ))}
-                  {skill.installed_locally ? <span className="local-pill is-local">in Codex</span> : null}
-                </div>
-              </button>
-            )
-          })}
-        </div>
-        {active ? (
-          <SkillDetail
-            key={active.skill_id}
-            skill={active}
-            onSubmitFeedback={(rating, note) =>
-              feedback.mutate({ skillId: active.skill_id, rating, note })
-            }
-            onRegenerate={() => regenerate.mutate(active.source_workflow)}
-            onRun={() => run.mutate(active.skill_id)}
-            submitting={feedback.isPending && feedback.variables?.skillId === active.skill_id}
-            regenerating={regenerate.isPending && regenerate.variables === active.source_workflow}
-            running={run.isPending && run.variables === active.skill_id}
-            progress={progress}
-            savedMsg={savedMsg[active.skill_id]}
-            runResult={runResult[active.skill_id]}
-          />
-        ) : null}
+      <div className="skill-tabs">
+        {items.map(skill => {
+          const isActive = active?.skill_id === skill.skill_id
+          return (
+            <button
+              key={skill.skill_id}
+              type="button"
+              className={`skill-tab ${isActive ? 'active' : ''}`}
+              onClick={() => setSelected(skill.skill_id)}
+            >
+              <strong>{skill.name}</strong>
+              <span>
+                {skill.step_count} steps · {skill.invocations} runs
+                {skill.installed_locally ? ' · in Codex' : ''}
+              </span>
+            </button>
+          )
+        })}
       </div>
+      {active ? (
+        <SkillDetail
+          key={active.skill_id}
+          skill={active}
+          onSubmitFeedback={(rating, note) =>
+            feedback.mutate({ skillId: active.skill_id, rating, note })
+          }
+          onRegenerate={() => regenerate.mutate(active.source_workflow)}
+          onRun={() => run.mutate(active.skill_id)}
+          submitting={feedback.isPending && feedback.variables?.skillId === active.skill_id}
+          regenerating={regenerate.isPending && regenerate.variables === active.source_workflow}
+          running={run.isPending && run.variables === active.skill_id}
+          progress={progress}
+          savedMsg={savedMsg[active.skill_id]}
+          runResult={runResult[active.skill_id]}
+        />
+      ) : null}
     </div>
   )
 }

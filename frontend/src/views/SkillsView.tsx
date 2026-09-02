@@ -237,7 +237,7 @@ function SkillDetail({
   )
 }
 
-export function SkillsView() {
+export function SkillsView({ onGoWatch }: { onGoWatch?: () => void }) {
   const queryClient = useQueryClient()
   const skills = useQuery({ queryKey: ['skills'], queryFn: getSkills })
   const memory = useQuery({ queryKey: ['memory-status'], queryFn: getMemoryStatus })
@@ -285,7 +285,14 @@ export function SkillsView() {
     return (
       <div className="view">
         <div className="empty-state">
-          No skills generated yet. Accept a recommendation to generate one and install it locally.
+          No skills generated yet.{' '}
+          {onGoWatch ? (
+            <button type="button" className="text-button" onClick={onGoWatch}>
+              Go to Watch and accept a recommendation
+            </button>
+          ) : (
+            'Accept a recommendation to generate one and install it locally.'
+          )}
         </div>
       </div>
     )

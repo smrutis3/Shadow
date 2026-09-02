@@ -6,7 +6,7 @@ import { Metric, SourceChip } from '../components/common'
 import { GenProgress } from '../components/GenProgress'
 import { cost, hours } from '../lib/format'
 
-function RecommendationCard({
+export function RecommendationCard({
   rec,
   onAccept,
   accepting,

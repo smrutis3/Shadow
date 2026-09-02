@@ -1,86 +1,41 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { getRecommendations, getSkills, getWorkflows } from './api/observatory'
-import { OverviewView } from './views/OverviewView'
-import { RecommendationsView } from './views/RecommendationsView'
-import { SkillsView } from './views/SkillsView'
-import { WorkflowsView } from './views/WorkflowsView'
-import { ActivityView } from './views/ActivityView'
-import { ConnectionsView } from './views/ConnectionsView'
-import { MemoryView } from './views/MemoryView'
-import { NavIcon } from './components/NavIcon'
+import { getRecommendations, getSkills } from './api/observatory'
+import { WatchView } from './views/WatchView'
+import { BuildView } from './views/BuildView'
+import { ImpactView } from './views/ImpactView'
 
-type ViewId = 'connections' | 'activity' | 'recommendations' | 'skills' | 'memory' | 'workflows' | 'overview'
+type StageId = 'watch' | 'build' | 'impact'
 
-const NAV_GROUPS: { label: string; items: { id: ViewId; label: string }[] }[] = [
+const STAGES: { id: StageId; label: string; title: string; lede: string }[] = [
   {
-    label: 'Observe',
-    items: [
-      { id: 'connections', label: 'Connections' },
-      { id: 'activity', label: 'Activity' },
-    ],
+    id: 'watch',
+    label: 'Watch',
+    title: 'Watch the work',
+    lede: 'Sources on the left, repeats on the right. Accept one to generate a skill.',
   },
   {
-    label: 'Automate',
-    items: [
-      { id: 'recommendations', label: 'Recommendations' },
-      { id: 'skills', label: 'Skills' },
-      { id: 'memory', label: 'Memory' },
-    ],
+    id: 'build',
+    label: 'Build',
+    title: 'Build and run the skill',
+    lede: 'Diagram, teach, and run in one studio. Memory stays on the side.',
   },
   {
-    label: 'Report',
-    items: [
-      { id: 'workflows', label: 'Workflows' },
-      { id: 'overview', label: 'Overview' },
-    ],
+    id: 'impact',
+    label: 'Impact',
+    title: 'Weekly impact',
+    lede: 'Time freed, AI cost, and the org workflows a forward-deployed engineer would ship.',
   },
 ]
 
-const TITLES: Record<ViewId, string> = {
-  connections: 'Connected sources',
-  activity: 'Live activity',
-  recommendations: 'Tasks to turn into skills',
-  skills: 'Your skills',
-  memory: 'Agent memory (HydraDB)',
-  workflows: 'Org workflows to deploy',
-  overview: 'Weekly FDE report',
-}
-
-const NOTES: Record<ViewId, string> = {
-  connections: 'Tools we watch. Connecting them is onboarding — we observe, we don’t act.',
-  activity: 'Raw signal across connected sources. This is what we mine into workflow recommendations.',
-  recommendations: 'Accepting a workflow generates a skill and installs it locally. It still runs under human approval.',
-  skills: 'Generated skills, guardrails, teaching, and live runs.',
-  memory: 'Autonomous reads and writes against HydraDB — the agent’s long-term memory, live.',
-  workflows: 'End-to-end processes composed from skills, with org-level impact.',
-  overview: 'Weekly FDE report: time freed, throughput, and AI cost.',
-}
-
-const GROUP_FOR: Record<ViewId, string> = {
-  connections: 'Observe',
-  activity: 'Observe',
-  recommendations: 'Automate',
-  skills: 'Automate',
-  memory: 'Automate',
-  workflows: 'Report',
-  overview: 'Report',
-}
-
 export default function App() {
-  const [view, setView] = useState<ViewId>('connections')
-  const activeGroup = GROUP_FOR[view]
-  const group = NAV_GROUPS.find(g => g.label === activeGroup) ?? NAV_GROUPS[0]
+  const [stage, setStage] = useState<StageId>('watch')
 
   const recommendations = useQuery({ queryKey: ['recommendations'], queryFn: getRecommendations })
   const skills = useQuery({ queryKey: ['skills'], queryFn: getSkills })
-  const workflows = useQuery({ queryKey: ['workflows'], queryFn: getWorkflows })
 
-  const badges: Partial<Record<ViewId, number>> = {
-    recommendations: recommendations.data?.filter(r => r.status !== 'accepted').length,
-    skills: skills.data?.length,
-    workflows: workflows.data?.length,
-  }
+  const pending = recommendations.data?.filter(r => r.status !== 'accepted').length
+  const skillCount = skills.data?.length
 
   return (
     <div className="fde-layout">
@@ -91,17 +46,17 @@ export default function App() {
         </div>
 
         <nav className="stage-rail" aria-label="Product stages">
-          {NAV_GROUPS.map((g, i) => (
+          {STAGES.map((s, i) => (
             <button
-              key={g.label}
+              key={s.id}
               type="button"
-              className={`stage-step ${activeGroup === g.label ? 'active' : ''}`}
-              onClick={() => {
-                if (!g.items.some(item => item.id === view)) setView(g.items[0].id)
-              }}
+              className={`stage-step ${stage === s.id ? 'active' : ''}`}
+              onClick={() => setStage(s.id)}
             >
               <span className="stage-index">{i + 1}</span>
-              <span>{g.label}</span>
+              <span>{s.label}</span>
+              {s.id === 'watch' && pending ? <span className="nav-badge">{pending}</span> : null}
+              {s.id === 'build' && skillCount ? <span className="nav-badge">{skillCount}</span> : null}
             </button>
           ))}
         </nav>
@@ -112,38 +67,18 @@ export default function App() {
         </div>
       </header>
 
-      <div className="subnav">
-        <div className="subnav-tabs">
-          {group.items.map(item => {
-            const badge = badges[item.id]
-            return (
-              <button
-                key={item.id}
-                type="button"
-                className={`subnav-tab ${view === item.id ? 'active' : ''}`}
-                onClick={() => setView(item.id)}
-              >
-                <NavIcon name={item.id} />
-                <span>{item.label}</span>
-                {badge ? <span className="nav-badge">{badge}</span> : null}
-              </button>
-            )
-          })}
-        </div>
-        <div className="page-intro">
-          <h2 className="content-title">{TITLES[view]}</h2>
-          <p className="page-lede">{NOTES[view]}</p>
-        </div>
+      <div className="stage-intro">
+        <p className="content-kicker">
+          {STAGES.findIndex(s => s.id === stage) + 1} / {STAGES.length}
+        </p>
+        <h2 className="content-title">{STAGES.find(s => s.id === stage)?.title}</h2>
+        <p className="page-lede">{STAGES.find(s => s.id === stage)?.lede}</p>
       </div>
 
       <main className="workspace">
-        {view === 'connections' ? <ConnectionsView /> : null}
-        {view === 'activity' ? <ActivityView /> : null}
-        {view === 'recommendations' ? <RecommendationsView /> : null}
-        {view === 'skills' ? <SkillsView /> : null}
-        {view === 'memory' ? <MemoryView /> : null}
-        {view === 'workflows' ? <WorkflowsView /> : null}
-        {view === 'overview' ? <OverviewView /> : null}
+        {stage === 'watch' ? <WatchView onInstalled={() => setStage('build')} /> : null}
+        {stage === 'build' ? <BuildView onGoWatch={() => setStage('watch')} /> : null}
+        {stage === 'impact' ? <ImpactView /> : null}
       </main>
     </div>
   )

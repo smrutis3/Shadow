@@ -172,5 +172,5 @@ UI-only preview (mock data, no Python server): `cd frontend && VITE_USE_MOCKS=1 
 4. **Run again** → it remembers, auto-resolves it (exceptions 1 → 0). Then open **Impact** for
    the weekly scoreboard. Codex did the engineering; you only signed off.
 
-Made By Smruti Singh
+
 

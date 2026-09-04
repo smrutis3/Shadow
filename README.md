@@ -1,10 +1,10 @@
-# Understudy — Codex as your company's forward-deployed engineer
+# Shadow — Codex as your company's forward-deployed engineer
 
 Every enterprise wants AI to "just work" on their workflows. But deploying it today looks
 like 2015: you hire a forward-deployed engineer, they shadow your team for weeks,
 hand-build an integration, and leave. Scale that across an org? Impossible.
 
-**Understudy is the agent that does what a forward-deployed engineer does — autonomously,
+**Shadow is the agent that does what a forward-deployed engineer does — autonomously,
 with Codex as the engineer.** Connect your tools (email, spreadsheets). It silently
 observes. It detects the repeated workflows hiding in plain sight. It surfaces them **on a
 dashboard** with ROI estimates. Accept one, and **Codex generates a production-grade skill**
@@ -23,7 +23,7 @@ No login or private workspace is needed to inspect the demo output in this repo:
 
 ### One step beyond ambient Codex
 Codex can already *watch* what you're doing — its ambient/computer-use awareness knows your
-activity. Understudy goes a step further: it's a **dashboard that auto-discovers the
+activity. Shadow goes a step further: it's a **dashboard that auto-discovers the
 workflows inside that activity** and turns each one into an **installed Codex workflow**
 (`~/.codex/prompts/<skill>.md` → invoke it as `/<skill>` inside Codex). Codex stops being a
 thing you prompt and becomes the engineer that ships your team's automation.
@@ -49,14 +49,14 @@ Codex personalizes and does the engineering; it never weakens safety.
 
 ## It monitors you — and spots what to automate
 
-Understudy is not a passive log. Once connected, it **continuously monitors** your activity
+Shadow is not a passive log. Once connected, it **continuously monitors** your activity
 across your tools — every email that arrives, every spreadsheet cell that changes, every
 reply you draft — and **actively analyzes it for the parts that can be automated.**
 
 - **Always-on watchers.** Connectors tail your Gmail and your workbooks, turning raw activity
   into a structured event stream (who did what, to which file, when).
 - **It stitches events into episodes.** A bank email → a spreadsheet update → a summary reply
-  isn't three unrelated events; Understudy joins them into one *episode* of real work.
+  isn't three unrelated events; Shadow joins them into one *episode* of real work.
 - **It detects the repeats.** Pattern detection looks for the same episode recurring — across
   days and across people — and scores how confident it is that this is a genuine, repeatable
   workflow worth automating.
@@ -66,7 +66,7 @@ reply you draft — and **actively analyzes it for the parts that can be automat
   the shortlist for you.
 
 That's the difference between a logger and a forward-deployed engineer: a logger records what
-happened; **Understudy diagnoses the toil hiding in plain sight and proposes the fix** — then
+happened; **Shadow diagnoses the toil hiding in plain sight and proposes the fix** — then
 Codex builds it and installs it as a Codex workflow.
 
 ## The flow
@@ -85,11 +85,11 @@ Nothing writes a file or sends mail until a human signs off. Skills install to
 
 ## Inside a real workflow: daily cash reconciliation (Gmail → Excel)
 
-This is one of the workflows Understudy discovered from raw activity, had Codex build, and
+This is one of the workflows Shadow discovered from raw activity, had Codex build, and
 now runs end-to-end — and you can watch every step of it live on **Build**.
 
 **The trigger.** Every business morning a *"Daily bank transactions"* email lands in **Gmail**
-with an `.xlsx` attachment. Understudy watched an analyst do the same thing with it three days
+with an `.xlsx` attachment. Shadow watched an analyst do the same thing with it three days
 running, flagged the pattern, and Codex turned it into a skill.
 
 **What actually runs** — each step is a node on the **Build** diagram:
@@ -119,7 +119,7 @@ running, flagged the pattern, and Codex turned it into a skill.
 - **Impact** — hours freed, added AI cost, ranked workflows, org workflow cards.
 
 **Why this is wild.** A human forward-deployed engineer would spend two weeks shadowing this
-analyst and hand-coding the integration. Understudy discovered the workflow from raw activity,
+analyst and hand-coding the integration. Shadow discovered the workflow from raw activity,
 had **Codex** write a production-grade, guardrailed version, **installed it into Codex as a
 `/daily-cash-reconciliation` workflow**, and ran it. And the next time `tx-1004` shows up, it
 already knows that's a known timing difference, because you told it once. The dashboard means
@@ -129,7 +129,7 @@ memory it reads is on screen, live.
 ## Architecture
 - **Backend** (Python) — `autoskill_agent/`: observe → recommend → generate → run → ops;
   `skillforge_local/`: email/Excel parsing, the **Codex engine** (`llm.py`), the
-  feedback-memory layer. HTTP API on `127.0.0.1:8017`.
+  feedback-memory layer. HTTP API on your machine at `http://localhost:8017`.
 - **Frontend** (React + Vite + TS) — `frontend/`. Vite proxies `/api` to the Python server.
   Three stages, one rail:
   - **Watch** — `GET /api/connections`, `/api/observations`, `/api/recommendations`;
@@ -140,6 +140,9 @@ memory it reads is on screen, live.
 - **Engine:** OpenAI **Codex CLI**. Optional: HydraDB for cross-session memory.
 
 ## Quickstart
+
+Run everything on your own machine. The API binds to localhost port **8017**; the dashboard is **http://localhost:5173**.
+
 ```bash
 # 0. Prereq: the Codex CLI (login or API key)
 npm i -g @openai/codex
@@ -147,18 +150,18 @@ npm i -g @openai/codex
 # 1. Key (.env.local is git-ignored)
 cp .env.example .env.local            # set OPENAI_API_KEY
 
-# 2. Backend
+# 2. Backend — http://localhost:8017
 pip install -r requirements.txt
 python -m autoskill_agent.cli skillgen-model-check     # confirms Codex is reachable
 python -m autoskill_agent.api_server --host 127.0.0.1 --port 8017
 
-# 3. Frontend (new terminal)
-cd frontend && npm install && npm run dev              # proxies /api to the backend
+# 3. Frontend — http://localhost:5173  (proxies /api to localhost:8017)
+cd frontend && npm install && npm run dev
 
 # Reset the demo between runs:
 python -m autoskill_agent.cli reset-demo --clear-memory
 ```
-Pure-frontend preview (in-browser mock data, no backend): `cd frontend && VITE_USE_MOCKS=1 npm run dev`.
+UI-only preview (mock data, no Python server): `cd frontend && VITE_USE_MOCKS=1 npm run dev` then open http://localhost:5173.
 
 ## Demo (≈2–3 min)
 1. **Watch** → pick a recommendation → **Accept & install skill**. Codex generates it and
@@ -170,3 +173,4 @@ Pure-frontend preview (in-browser mock data, no backend): `cd frontend && VITE_U
    the weekly scoreboard. Codex did the engineering; you only signed off.
 
 Made By Smruti Singh
+

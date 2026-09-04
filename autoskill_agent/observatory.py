@@ -470,7 +470,7 @@ def install_as_codex_workflow(slug: str, skill_md: str) -> str:
     prompts.mkdir(parents=True, exist_ok=True)
     path = prompts / f"{slug}.md"
     header = (
-        f"# /{slug} — installed by Understudy\n\n"
+        f"# /{slug} — installed by Shadow\n\n"
         "Run this workflow the way a forward-deployed engineer would: follow the steps "
         "and guardrails exactly, and pause for human approval before writing any file.\n\n"
         "---\n\n"

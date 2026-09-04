@@ -1,6 +1,6 @@
-"""Codex-CLI-backed LLM helper — Understudy's engine.
+"""Codex-CLI-backed LLM helper — Shadow's engine.
 
-Every AI call in Understudy routes through this module, and every call runs through
+Every AI call in Shadow routes through this module, and every call runs through
 the **OpenAI Codex CLI** (`codex exec`) in API-key mode. There is no Anthropic/OpenAI
 SDK call here: Codex is the engine, so the whole product is powered by Codex.
 
@@ -97,13 +97,13 @@ def complete_text(
     if not key:
         raise RuntimeError(
             "OPENAI_API_KEY is not set. Add it to .env.local at the project root "
-            "or export it in your shell. (Understudy runs on the Codex CLI.)"
+            "or export it in your shell. (Shadow runs on the Codex CLI.)"
         )
 
     prompt = _messages_to_prompt(messages)
     chosen_model = (model if _is_openai_model(model) else None) or (os.environ.get("CODEX_MODEL") or None)
 
-    with tempfile.TemporaryDirectory(prefix="understudy-codex-") as workdir:
+    with tempfile.TemporaryDirectory(prefix="shadow-codex-") as workdir:
         out_path = Path(workdir) / "last_message.txt"
         cmd = [
             "codex", "exec",

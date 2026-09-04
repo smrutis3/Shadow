@@ -5,7 +5,7 @@ like 2015: you hire a forward-deployed engineer, they shadow your team for weeks
 hand-build an integration, and leave. Scale that across an org? Impossible.
 
 **Understudy is the agent that does what a forward-deployed engineer does — autonomously,
-with Codex as the engineer.** Connect your tools (email, spreadsheets, Slack). It silently
+with Codex as the engineer.** Connect your tools (email, spreadsheets). It silently
 observes. It detects the repeated workflows hiding in plain sight. It surfaces them **on a
 dashboard** with ROI estimates. Accept one, and **Codex generates a production-grade skill**
 — complete with guardrails, validation, and a live execution diagram — then **installs it
@@ -15,21 +15,11 @@ straight into Codex as a runnable `/workflow`**, ready to fire on your next trig
 
 No login or private workspace is needed to inspect the demo output in this repo:
 
-- **Live demo video:** https://youtu.be/RYGWzJ3iu-g
-- **Screenshots:** recommendation discovery, generated skill guardrails, org workflows, and
-  weekly impact overview are shown below.
+- **Dashboard:** `frontend/` — three-stage workbench (**Watch → Build → Impact**). Run it locally (see Quickstart).
+- **Screenshots:** add later under [`docs/screenshots/`](docs/screenshots/) as `watch.png`, `build.png`, `impact.png`.
 - **Generated workbook:** [`cash_recon_2026_06_15_reconciled.xlsx`](workspace/workbooks/generated/cash_recon_2026_06_15_reconciled.xlsx)
 - **Draft reply:** [`cash_recon_2026_06_15_reply.eml`](workspace/mail/drafts/cash_recon_2026_06_15_reply.eml)
 - **Review/audit record:** [`review_cand_daily_cash_recon_001.json`](workspace/reviews/review_cand_daily_cash_recon_001.json)
-
-<p>
-  <img src="docs/screenshots/recommendations.png" alt="Understudy detects a daily cash reconciliation task and installs it into Codex" width="49%">
-  <img src="docs/screenshots/skill-run-feedback.png" alt="Understudy generated skill guardrails, feedback, and run controls" width="49%">
-</p>
-<p>
-  <img src="docs/screenshots/workflows.png" alt="Understudy recommends organization-level workflows to deploy" width="49%">
-  <img src="docs/screenshots/overview.png" alt="Understudy weekly impact overview and skill invocation trend" width="49%">
-</p>
 
 ### One step beyond ambient Codex
 Codex can already *watch* what you're doing — its ambient/computer-use awareness knows your
@@ -44,9 +34,9 @@ Rate a generated skill — *"match against the Payment Export sheet, not the raw
 every future generation reflects that preference. **Memory isn't a feature; it's why this
 agent compounds instead of resetting to zero every morning.** Long-term memory is stored in
 and recalled from **HydraDB** — cross-session, cross-skill, per-reviewer namespaced (with a
-local fallback if no key is set). A live **Memory tab** streams every autonomous read/write
-in real time; wipe all local state and regenerate, and it still remembers, because HydraDB
-does.
+local fallback if no key is set). On **Build**, a live Memory panel streams every autonomous
+read/write in real time; wipe all local state and regenerate, and it still remembers, because
+HydraDB does.
 
 **Engine:** every AI call — workflow detection, skill generation, plan refinement, and
 execution — runs through the **OpenAI Codex CLI** (`codex exec`, API-key mode). Deterministic
@@ -71,34 +61,38 @@ reply you draft — and **actively analyzes it for the parts that can be automat
   days and across people — and scores how confident it is that this is a genuine, repeatable
   workflow worth automating.
 - **It hands you the opportunity, with ROI.** The moment a pattern crosses the bar, it appears
-  on your dashboard as a candidate: how often it happens, the hours it's costing, the
-  throughput you'd gain, the AI cost to run it. You never go hunting for what to automate — it
-  surfaces the shortlist for you.
+  on **Watch** as a candidate: how often it happens, the hours it's costing, the throughput
+  you'd gain, the AI cost to run it. You never go hunting for what to automate — it surfaces
+  the shortlist for you.
 
 That's the difference between a logger and a forward-deployed engineer: a logger records what
 happened; **Understudy diagnoses the toil hiding in plain sight and proposes the fix** — then
 Codex builds it and installs it as a Codex workflow.
 
 ## The flow
-1. **Observe** — watch email + spreadsheet activity; detect a repeated workflow.
-2. **Discover (dashboard)** — surface it with ROI (time saved, throughput, AI cost).
-3. **Generate (Codex)** — accept → Codex drafts + refines a production-grade skill.
-4. **Install into Codex** — the skill lands in `~/.codex/prompts/` as a `/workflow`.
-5. **Run (Codex)** — execute on a new event: read the bank attachment, reconcile, write a
-   real reconciled `.xlsx` + reply draft + audit record — under human sign-off.
-6. **Learn** — feedback + corrections are remembered (HydraDB) and folded into the next run.
+
+The dashboard is three stages on the top rail. Same loop as the backend.
+
+1. **Watch** — connected sources + live activity timeline + recommendation queue.
+   Accept → Codex generates a skill and installs it into Codex.
+2. **Build** — skill studio: execution diagram, guardrails, teach, and **Run**. Memory
+   (HydraDB) sits beside the run so you can see every recall/write.
+3. **Impact** — weekly FDE scoreboard (hours freed, FTE, throughput, added AI cost) plus
+   org-level workflows to deploy.
+
+Nothing writes a file or sends mail until a human signs off. Skills install to
+`~/.codex/prompts/` as `/workflow`s.
 
 ## Inside a real workflow: daily cash reconciliation (Gmail → Excel)
 
 This is one of the workflows Understudy discovered from raw activity, had Codex build, and
-now runs end-to-end — and you can watch every step of it live on the dashboard.
+now runs end-to-end — and you can watch every step of it live on **Build**.
 
 **The trigger.** Every business morning a *"Daily bank transactions"* email lands in **Gmail**
 with an `.xlsx` attachment. Understudy watched an analyst do the same thing with it three days
 running, flagged the pattern, and Codex turned it into a skill.
 
-**What actually runs** — each step below is a node that lights up on the Skills tab's live
-execution diagram as Codex works through it:
+**What actually runs** — each step is a node on the **Build** diagram:
 
 1. **Read the bank attachment** — open the attached `bank_transactions_*.xlsx` and pull every
    row (txn id, bank amount, ERP amount).
@@ -117,28 +111,32 @@ execution diagram as Codex works through it:
 8. **Validate + audit** — re-open the output, confirm the guardrails held, and write an audit
    record of exactly what happened.
 
-**And you can watch all of it, anytime, from the dashboard:**
-- **Activity** streams the raw events Understudy observed (the email arriving, rows changing).
-- **Skills** shows the skill's **live execution diagram** — those 8 nodes lighting up as Codex
-  runs them — alongside the guardrails and the **downloadable artifacts** (the reconciled
-  `.xlsx` and the `.eml` draft you can open).
-- **Memory** streams every HydraDB read/write in real time.
-- **Overview** rolls it into a weekly report: hours freed, throughput multiplier, AI cost.
+**Where that shows up in the UI:**
+- **Watch** — timeline of the email arriving and rows changing; Accept on the cash-recon
+  candidate.
+- **Build** — diagram + teach + run; downloadable reconciled `.xlsx` and `.eml` draft; Memory
+  panel for HydraDB reads/writes.
+- **Impact** — hours freed, added AI cost, ranked workflows, org workflow cards.
 
 **Why this is wild.** A human forward-deployed engineer would spend two weeks shadowing this
 analyst and hand-coding the integration. Understudy discovered the workflow from raw activity,
 had **Codex** write a production-grade, guardrailed version, **installed it into Codex as a
-`/daily-cash-reconciliation` workflow**, and ran it — in the time it takes to read this
-paragraph. And the next time `tx-1004` shows up, it already knows that's a known timing
-difference, because you told it once. The dashboard means this never runs as a black box: every
-observation, every step, every file it writes, and every memory it reads is on screen, live.
+`/daily-cash-reconciliation` workflow**, and ran it. And the next time `tx-1004` shows up, it
+already knows that's a known timing difference, because you told it once. The dashboard means
+this never runs as a black box: every observation, every step, every file it writes, and every
+memory it reads is on screen, live.
 
 ## Architecture
 - **Backend** (Python) — `autoskill_agent/`: observe → recommend → generate → run → ops;
   `skillforge_local/`: email/Excel parsing, the **Codex engine** (`llm.py`), the
-  feedback-memory layer.
-- **Frontend** (React + Vite + TS) — `frontend/`: Connections, Activity, Recommendations,
-  Skills (feedback + Run), Memory, Workflows, Overview.
+  feedback-memory layer. HTTP API on `127.0.0.1:8017`.
+- **Frontend** (React + Vite + TS) — `frontend/`. Vite proxies `/api` to the Python server.
+  Three stages, one rail:
+  - **Watch** — `GET /api/connections`, `/api/observations`, `/api/recommendations`;
+    `POST /api/recommendations/:id/accept/stream`
+  - **Build** — `GET /api/skills`, `/api/memory/status`, `/api/memory/trace`;
+    `POST /api/skills/:id/feedback`, `/api/skills/:id/run`
+  - **Impact** — `GET /api/report/weekly`, `/api/workflows`
 - **Engine:** OpenAI **Codex CLI**. Optional: HydraDB for cross-session memory.
 
 ## Quickstart
@@ -163,13 +161,12 @@ python -m autoskill_agent.cli reset-demo --clear-memory
 Pure-frontend preview (in-browser mock data, no backend): `cd frontend && VITE_USE_MOCKS=1 npm run dev`.
 
 ## Demo (≈2–3 min)
-1. **Recommendations → Accept** → Codex generates the skill and installs it into Codex as
-   `/daily-cash-reconciliation`.
-2. **Skills → Run** → Codex executes it: 1 exception flagged (a known $10 timing difference),
+1. **Watch** → pick a recommendation → **Accept & install skill**. Codex generates it and
+   installs `/daily-cash-reconciliation`. The UI moves you to **Build**.
+2. **Build → Run on a new bank email** → 1 exception flagged (a known $10 timing difference),
    a real reconciled `.xlsx` produced.
-3. **Teach it** — "that's a known timing difference, treat as matched."
-4. **Run again** → it remembers, auto-resolves it (exceptions 1 → 0). Codex did the
-   engineering; you only signed off.
+3. **Teach this skill** — "that's a known timing difference, treat as matched." Memory records it.
+4. **Run again** → it remembers, auto-resolves it (exceptions 1 → 0). Then open **Impact** for
+   the weekly scoreboard. Codex did the engineering; you only signed off.
 
-
-
+Made By Smruti Singh

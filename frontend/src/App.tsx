@@ -42,7 +42,7 @@ export default function App() {
       <header className="topbar">
         <div className="brand">
           <span className="brand-mark" aria-hidden="true" />
-          <span className="brand-name">Understudy</span>
+          <span className="brand-name">Shadow</span>
         </div>
 
         <nav className="stage-rail" aria-label="Product stages">

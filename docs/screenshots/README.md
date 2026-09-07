@@ -1,6 +1,6 @@
 # Dashboard screenshots
 
-Add PNGs **in this folder** later. The root [README.md](../../README.md) expects:
+These files are shown in the root [README.md](../../README.md):
 
 | File | Screen |
 | --- | --- |

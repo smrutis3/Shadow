@@ -16,10 +16,22 @@ straight into Codex as a runnable `/workflow`**, ready to fire on your next trig
 No login or private workspace is needed to inspect the demo output in this repo:
 
 - **Dashboard:** `frontend/` — three-stage workbench (**Watch → Build → Impact**). Run it locally (see Quickstart).
-- **Screenshots:** add later under [`docs/screenshots/`](docs/screenshots/) as `watch.png`, `build.png`, `impact.png`.
+- **Screenshots:** [`docs/screenshots/`](docs/screenshots/)
 - **Generated workbook:** [`cash_recon_2026_06_15_reconciled.xlsx`](workspace/workbooks/generated/cash_recon_2026_06_15_reconciled.xlsx)
 - **Draft reply:** [`cash_recon_2026_06_15_reply.eml`](workspace/mail/drafts/cash_recon_2026_06_15_reply.eml)
 - **Review/audit record:** [`review_cand_daily_cash_recon_001.json`](workspace/reviews/review_cand_daily_cash_recon_001.json)
+
+**Watch** — sources, activity, Accept a workflow
+
+![Watch](docs/screenshots/watch.png)
+
+**Build** — skill diagram, teach/run, Memory
+
+![Build](docs/screenshots/build.png)
+
+**Impact** — weekly FDE scoreboard and org workflows
+
+![Impact](docs/screenshots/impact.png)
 
 ### One step beyond ambient Codex
 Codex can already *watch* what you're doing — its ambient/computer-use awareness knows your

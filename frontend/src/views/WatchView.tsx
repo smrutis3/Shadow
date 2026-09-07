@@ -4,7 +4,7 @@ import { acceptRecommendation, getConnections, getObservations, getRecommendatio
 import type { AcceptProgress, AcceptResult } from '../api/observatory'
 import { SourceChip } from '../components/common'
 import { timeAgo } from '../lib/format'
-import { RecommendationCard } from './RecommendationsView'
+import { RecommendationCard } from '../components/RecommendationCard'
 
 export function WatchView({ onInstalled }: { onInstalled?: () => void }) {
   const queryClient = useQueryClient()

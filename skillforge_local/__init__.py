@@ -1,1 +1,1 @@
-"""Local workflow skillizer prototype for the hackathon MVP."""
+"""Email/Excel parsing, Codex engine, and feedback memory for Shadow."""

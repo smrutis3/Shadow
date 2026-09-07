@@ -33,7 +33,6 @@ The first command fetches unread IMAP messages, sends each parsed email to OpenC
 Run the integrated Section A -> Section B path:
 
 ```powershell
-cd D:\hackathon
 python -m autoskill_agent.cli skillgen-section-a-demo --reset --execute
 ```
 
@@ -42,7 +41,6 @@ This is the preferred hackathon demo path. It starts with Section A activity eve
 Run the Team B-only seeded demo:
 
 ```powershell
-cd D:\hackathon
 python -m autoskill_agent.cli skillgen-demo --reset
 ```
 
@@ -52,7 +50,7 @@ The demo creates the mocked finance candidate from the design doc, installs the 
 
 ```powershell
 python -m autoskill_agent.cli skillgen-bootstrap --force
-python -m autoskill_agent.cli skillgen-seed-section-a --workbook "D:\apps\wechat\WeChat Files\wxid_jf2437118jx422\FileStorage\File\2026-06\skillforge_finance_demo_cash_recon.xlsx" --force
+python -m autoskill_agent.cli skillgen-seed-section-a --workbook workspace/workbooks/skillforge_finance_demo_cash_recon.xlsx --force
 python -m autoskill_agent.cli skillgen-review --candidate-id cand_daily_cash_recon_001
 python -m autoskill_agent.cli skillgen-install --review-session-id review_cand_daily_cash_recon_001
 python -m autoskill_agent.cli skillgen-match

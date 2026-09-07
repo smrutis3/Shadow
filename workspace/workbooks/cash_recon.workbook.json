@@ -5,5 +5,5 @@
     "Daily Reconciliation",
     "Payment Export"
   ],
-  "workbook": "/Users/lizhuolun/cursor/hackathons/fde-agent/workspace/workbooks/cash_recon.xlsx"
+  "workbook": "workspace/workbooks/cash_recon.xlsx"
 }

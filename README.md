@@ -11,15 +11,7 @@ dashboard** with ROI estimates. Accept one, and **Codex generates a production-g
 — complete with guardrails, validation, and a live execution diagram — then **installs it
 straight into Codex as a runnable `/workflow`**, ready to fire on your next trigger.
 
-## Openable demo artifacts
-
-No login or private workspace is needed to inspect the demo output in this repo:
-
-- **Dashboard:** `frontend/` — three-stage workbench (**Watch → Build → Impact**). Run it locally (see Quickstart).
-- **Screenshots:** [`docs/screenshots/`](docs/screenshots/)
-- **Generated workbook:** [`cash_recon_2026_06_15_reconciled.xlsx`](workspace/workbooks/generated/cash_recon_2026_06_15_reconciled.xlsx)
-- **Draft reply:** [`cash_recon_2026_06_15_reply.eml`](workspace/mail/drafts/cash_recon_2026_06_15_reply.eml)
-- **Review/audit record:** [`review_cand_daily_cash_recon_001.json`](workspace/reviews/review_cand_daily_cash_recon_001.json)
+The dashboard is `frontend/` — three stages, **Watch → Build → Impact**. Run it locally (see Quickstart).
 
 **Watch** — sources, activity, Accept a workflow
 

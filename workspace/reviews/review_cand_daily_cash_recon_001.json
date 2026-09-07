@@ -90,7 +90,7 @@
     "warnings": []
   },
   "review_session_id": "review_cand_daily_cash_recon_001",
-  "skill_dir": "/Users/lizhuolun/understudy/workspace/skills/daily-cash-reconciliation",
+  "skill_dir": "workspace/skills/daily-cash-reconciliation",
   "skill_id": "daily_cash_reconciliation",
   "source_contract_version": "section_a.skill_candidate.v1",
   "status": "installed",
